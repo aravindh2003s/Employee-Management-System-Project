@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Nexus - Leaves</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-layer-group" style="color: var(--secondary-color); margin-right: 12px;"></i>
+                HR Nexus
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="admin-dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="employees.html"><i class="fas fa-users"></i> Employees</a></li>
+                <li><a href="departments.html"><i class="fas fa-building"></i> Departments</a></li>
+                <li><a href="attendance.html"><i class="fas fa-clock"></i> Attendance</a></li>
+                <li><a href="leaves.html" class="active"><i class="fas fa-calendar-alt"></i> Leave Management</a></li>
+                <li><a href="payroll.html"><i class="fas fa-money-check-alt"></i> Payroll</a></li>
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="search-bar"></div>
+                <div class="user-profile">Admin User</div>
+            </header>
+
+            <div class="content-area">
+                <div class="page-header">
+                    <h1 class="page-title">Leave Requests</h1>
+                    <div>
+                        <button class="btn" style="width: auto;" onclick="applyLeave()"><i class="fas fa-paper-plane"></i> Apply Leave</button>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <table id="leaveTable">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaveTableBody">
+                            <tr><td colspan="6" style="text-align: center;">Loading leaves...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', loadLeaves);
+
+        function loadLeaves() {
+            fetch(`${API_URL}/leaves`, { headers: getAuthHeaders() })
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('leaveTableBody');
+                tbody.innerHTML = '';
+                if(data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No leave requests found</td></tr>';
+                    return;
+                }
+                data.forEach(leave => {
+                    let badgeClass = leave.status === 'APPROVED' ? 'active' : (leave.status === 'REJECTED' ? 'inactive' : 'yellow');
+                    tbody.innerHTML += `
+                        <tr>
+                            <td style="font-weight: 500;">${leave.user ? leave.user.firstName + ' ' + leave.user.lastName : 'Unknown'}</td>
+                            <td>${leave.leaveType || 'Sick Leave'}</td>
+                            <td>${leave.startDate} to ${leave.endDate}</td>
+                            <td>${leave.reason}</td>
+                            <td><span class="badge ${badgeClass}">${leave.status}</span></td>
+                            <td>
+                                ${leave.status === 'PENDING' ? `
+                                <button onclick="updateStatus(${leave.id}, 'APPROVED')" style="background:none; border:none; color: #10b981; cursor: pointer; margin-right: 10px;"><i class="fas fa-check"></i></button>
+                                <button onclick="updateStatus(${leave.id}, 'REJECTED')" style="background:none; border:none; color: #ef4444; cursor: pointer;"><i class="fas fa-times"></i></button>
+                                ` : '-'}
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(err => console.error('Error fetching leaves:', err));
+        }
+
+        function updateStatus(id, status) {
+            fetch(`${API_URL}/leaves/${id}/status`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ status: status, adminRemarks: "Updated via admin panel" })
+            })
+            .then(() => loadLeaves());
+        }
+
+        function applyLeave() {
+            const req = {
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+                reason: "Not feeling well",
+                leaveType: "SICK_LEAVE"
+            };
+            fetch(`${API_URL}/leaves/apply`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(req)
+            })
+            .then(() => { alert("Leave applied for testing!"); loadLeaves(); });
+        }
+    </script>
+</body>
+</html>
