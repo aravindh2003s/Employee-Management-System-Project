@@ -4,41 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Nexus - Departments</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
+    <div class="dashboard-wrapper">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-layer-group" style="color: var(--secondary-color); margin-right: 12px;"></i>
-                HR Nexus
+            <div class="brand-logo">
+                <div class="brand-icon"></div>
+                <span>HR Nexus</span>
             </div>
-            <ul class="sidebar-menu">
-                <li><a href="admin-dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="employees.html"><i class="fas fa-users"></i> Employees</a></li>
-                <li><a href="departments.html" class="active"><i class="fas fa-building"></i> Departments</a></li>
-                <li><a href="attendance.html"><i class="fas fa-clock"></i> Attendance</a></li>
-                <li><a href="leaves.html"><i class="fas fa-calendar-alt"></i> Leave Management</a></li>
-                <li><a href="payroll.html"><i class="fas fa-money-check-alt"></i> Payroll</a></li>
-                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <ul class="nav-menu">
+                <li><a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+                <li><a href="employees.html" class="nav-item "><i class="fa-solid fa-users"></i> Employees</a></li>
+                <li><a href="departments.html" class="nav-item active"><i class="fa-solid fa-sitemap"></i> Departments</a></li>
+                <li><a href="attendance.html" class="nav-item "><i class="fa-regular fa-clock"></i> Attendance</a></li>
+                <li><a href="leaves.html" class="nav-item "><i class="fa-regular fa-calendar-check"></i> Leave</a></li>
+                <li><a href="payroll.html" class="nav-item "><i class="fa-solid fa-wallet"></i> Payroll</a></li>
+                <li><a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Reports</a></li>
+                <li><a href="#" class="nav-item"><i class="fa-regular fa-bell"></i> Notifications</a></li>
+                <li style="margin-top: auto;"><a href="#" class="nav-item" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </aside>
-
-        <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
-                <div class="search-bar"></div>
-                <div class="user-profile">Admin User</div>
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Search...">
+                </div>
+                <div class="header-actions">
+                    <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
+                    <div class="theme-toggle">
+                        <div class="theme-btn"><i class="fa-regular fa-sun"></i></div>
+                        <div class="theme-btn active"><i class="fa-regular fa-moon"></i></div>
+                    </div>
+                    <span class="date-display">Aug 26, 2023</span>
+                    <div class="user-profile">
+                        <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile">
+                    </div>
+                </div>
             </header>
+            <div class="dashboard-scroll">
 
-            <div class="content-area">
                 <div class="page-header">
                     <h1 class="page-title">Departments</h1>
                     <div>
-                        <button class="btn" style="width: auto;"><i class="fas fa-plus"></i> Add Department</button>
+                        <button class="btn btn-primary" style="width: auto;" onclick="openDeptModal()"><i class="fas fa-plus"></i> Add Department</button>
                     </div>
                 </div>
 
@@ -77,11 +88,11 @@
                         </tbody>
                     </table>
                 </div>
+            
             </div>
         </main>
     </div>
-
-    <script src="js/auth.js"></script>
+<script src="js/auth.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             fetch(`${API_URL}/departments`, { headers: getAuthHeaders() })
@@ -142,5 +153,37 @@
             .catch(err => console.error('Error fetching employees:', err));
         }
     </script>
+<script src="js/theme.js"></script>
+
+<div class="modal-overlay" id="addDeptModal">
+    <div class="modal-content">
+        <h2>Add New Department</h2>
+        <form id="addDeptForm" onsubmit="submitDeptForm(event)">
+            <div class="form-group"><label>Department Name</label><input type="text" id="deptName" required></div>
+            <div class="form-group"><label>Description</label><input type="text" id="deptDesc"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal('addDeptModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Department</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function openDeptModal() { document.getElementById('addDeptModal').classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function submitDeptForm(e) {
+        e.preventDefault();
+        const data = { name: document.getElementById('deptName').value, description: document.getElementById('deptDesc').value };
+        fetch(API_URL + '/departments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(data)
+        }).then(res => {
+            if(res.ok) { closeModal('addDeptModal'); location.reload(); }
+            else alert('Failed to add department');
+        });
+    }
+</script>
+
 </body>
 </html>

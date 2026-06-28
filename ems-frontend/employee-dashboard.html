@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Nexus - My Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <!-- Sidebar for Employee -->
+        <aside class="sidebar">
+            <div class="brand-logo">
+                <div class="brand-icon"></div>
+                <span>HR Nexus</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="employee-dashboard.html" class="nav-item active"><i class="fa-solid fa-user"></i> My Profile</a></li>
+                <li style="margin-top: auto;"><a href="#" class="nav-item" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header" style="justify-content: flex-end;">
+                <div class="header-actions">
+                    <div class="theme-toggle">
+                        <div class="theme-btn"><i class="fa-regular fa-sun"></i></div>
+                        <div class="theme-btn active"><i class="fa-regular fa-moon"></i></div>
+                    </div>
+                    <div class="user-profile">
+                        <span id="header-name">Employee</span>
+                        <img src="https://i.pravatar.cc/150?u=employee" alt="Profile">
+                    </div>
+                </div>
+            </header>
+            
+            <div class="dashboard-scroll">
+                <div style="max-width: 800px; margin: 0 auto; padding-top: 40px;">
+                    <div class="table-card" style="padding: 40px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+                        <img id="profile-img" src="https://ui-avatars.com/api/?name=E+M&size=120" style="border-radius: 50%; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.2);">
+                        <h1 id="emp-name" style="font-family: 'Sora', sans-serif; font-size: 32px; margin-bottom: 10px;">Loading...</h1>
+                        <p id="emp-designation" style="color: var(--text-secondary); font-size: 18px; margin-bottom: 30px;">Loading...</p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; text-align: left; margin-top: 20px;">
+                            <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 12px; border: 1px solid var(--surface-border);">
+                                <label style="color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Employee ID</label>
+                                <div id="emp-id" style="font-size: 16px; font-weight: 500; margin-top: 5px;">...</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 12px; border: 1px solid var(--surface-border);">
+                                <label style="color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Department</label>
+                                <div id="emp-dept" style="font-size: 16px; font-weight: 500; margin-top: 5px;">...</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 12px; border: 1px solid var(--surface-border);">
+                                <label style="color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Email Address</label>
+                                <div id="emp-email" style="font-size: 16px; font-weight: 500; margin-top: 5px;">...</div>
+                            </div>
+                            <div style="background: rgba(0,0,0,0.1); padding: 20px; border-radius: 12px; border: 1px solid var(--surface-border);">
+                                <label style="color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Joining Date</label>
+                                <div id="emp-joining" style="font-size: 16px; font-weight: 500; margin-top: 5px;">...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="js/auth.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch(API_URL + '/employees/me', {
+                headers: getAuthHeaders()
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('header-name').textContent = data.firstName;
+                document.getElementById('emp-name').textContent = data.firstName + ' ' + data.lastName;
+                document.getElementById('emp-designation').textContent = data.designation || 'Employee';
+                document.getElementById('emp-id').textContent = data.employeeId || 'N/A';
+                document.getElementById('emp-dept').textContent = data.departmentName || 'N/A';
+                document.getElementById('emp-email').textContent = data.email || 'N/A';
+                document.getElementById('emp-joining').textContent = data.joiningDate || 'N/A';
+                document.getElementById('profile-img').src = `https://ui-avatars.com/api/?name=${data.firstName}+${data.lastName}&size=120`;
+            })
+            .catch(err => {
+                console.error('Error fetching profile:', err);
+                alert('Could not load profile data');
+            });
+        });
+    </script>
+</body>
+</html>

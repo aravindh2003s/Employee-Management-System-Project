@@ -28,7 +28,7 @@ public class PayrollService {
         return payrollRepository.findByUserId(userId);
     }
 
-    public Payroll generatePayroll(Long userId, int month, int year, double bonus, double deductions) {
+    public Payroll generatePayroll(@org.springframework.lang.NonNull Long userId, int month, int year, double bonus, double deductions) {
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         
         Payroll payroll = new Payroll();

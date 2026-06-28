@@ -27,7 +27,7 @@ public class AttendanceController {
     @GetMapping("/my")
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('ADMIN')")
     public List<Attendance> getMyAttendance(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
         // Here we should Ideally pass user ID, but we can resolve it in service by email
         // To keep it simple we just get all for now, or we can fetch by email in a real app
         // Let's implement fetching by ID in service if we had ID, but we don't in UserDetails easily.

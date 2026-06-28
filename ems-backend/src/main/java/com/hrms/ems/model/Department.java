@@ -2,7 +2,6 @@ package com.hrms.ems.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "departments")

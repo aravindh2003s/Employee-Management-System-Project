@@ -4,7 +4,6 @@ import com.hrms.ems.model.EmploymentType;
 import com.hrms.ems.model.Role;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class EmployeeDTO {
     private Long id;

@@ -4,63 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Nexus - Employees</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
+    <div class="dashboard-wrapper">
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-layer-group" style="color: var(--secondary-color); margin-right: 12px;"></i>
-                HR Nexus
+            <div class="brand-logo">
+                <div class="brand-icon"></div>
+                <span>HR Nexus</span>
             </div>
-            <ul class="sidebar-menu">
-                <li><a href="admin-dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="employees.html" class="active"><i class="fas fa-users"></i> Employees</a></li>
-                <li><a href="departments.html"><i class="fas fa-building"></i> Departments</a></li>
-                <li><a href="attendance.html"><i class="fas fa-clock"></i> Attendance</a></li>
-                <li><a href="leaves.html"><i class="fas fa-calendar-alt"></i> Leave Management</a></li>
-                <li><a href="payroll.html"><i class="fas fa-money-check-alt"></i> Payroll</a></li>
-                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            <ul class="nav-menu">
+                <li><a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+                <li><a href="employees.html" class="nav-item active"><i class="fa-solid fa-users"></i> Employees</a></li>
+                <li><a href="departments.html" class="nav-item "><i class="fa-solid fa-sitemap"></i> Departments</a></li>
+                <li><a href="attendance.html" class="nav-item "><i class="fa-regular fa-clock"></i> Attendance</a></li>
+                <li><a href="leaves.html" class="nav-item "><i class="fa-regular fa-calendar-check"></i> Leave</a></li>
+                <li><a href="payroll.html" class="nav-item "><i class="fa-solid fa-wallet"></i> Payroll</a></li>
+                <li><a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Reports</a></li>
+                <li><a href="#" class="nav-item"><i class="fa-regular fa-bell"></i> Notifications</a></li>
+                <li style="margin-top: auto;"><a href="#" class="nav-item" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </aside>
-
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Top Header -->
             <header class="top-header">
-                <div class="search-bar">
-                    <input type="text" placeholder="Search employees..." style="border: 1px solid #ddd; padding: 8px; border-radius: 4px; width: 300px;">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search...">
                 </div>
-                <div class="user-profile">
-                    Admin User
+                <div class="header-actions">
+                    <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
+                    <div class="theme-toggle">
+                        <div class="theme-btn"><i class="fa-regular fa-sun"></i></div>
+                        <div class="theme-btn active"><i class="fa-regular fa-moon"></i></div>
+                    </div>
+                    <span class="date-display">Aug 26, 2023</span>
+                    <div class="user-profile">
+                        <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile">
+                    </div>
                 </div>
             </header>
+            <div class="dashboard-scroll">
 
-            <div class="content-area">
                 <div class="page-header">
                     <h1 class="page-title">Employee Directory</h1>
-                    <div>
-                        <button class="btn" style="width: auto; background: white; color: #333; border: 1px solid #ddd; margin-right: 10px;"><i class="fas fa-file-export"></i> Export</button>
-                        <button class="btn" style="width: auto;"><i class="fas fa-plus"></i> Add Employee</button>
+                    <div class="page-header-actions">
+                        <button class="btn btn-outline" id="exportBtn" onclick="exportToPDF()"><i class="fas fa-file-export"></i> Export PDF</button>
+                        <button class="btn btn-primary" onclick="openEmpModal()"><i class="fas fa-plus"></i> Add Employee</button>
                     </div>
                 </div>
 
                 <div class="table-card">
                     <div class="table-header">
-                        <div style="display: flex; gap: 15px;">
-                            <select style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                                <option>All Departments</option>
-                                <option>Engineering</option>
-                                <option>HR</option>
+                        <div class="filter-group">
+                            <select id="deptFilter" class="custom-select">
+                                <option value="">All Departments</option>
                             </select>
-                            <select style="padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                                <option>All Status</option>
-                                <option>Active</option>
-                                <option>Inactive</option>
+                            <select id="statusFilter" class="custom-select">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
                             </select>
+                        </div>
+                        <div class="table-stats">
+                            <span class="text-secondary" style="font-size: 13px;" id="empCountDisplay"></span>
                         </div>
                     </div>
                     <table id="employeeTable">
@@ -82,51 +89,193 @@
                         </tbody>
                     </table>
                 </div>
+            
             </div>
         </main>
     </div>
-
-    <script src="js/auth.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="js/auth.js"></script>
     <script>
+        let allEmployees = [];
+        let currentFilteredEmployees = [];
+
         document.addEventListener('DOMContentLoaded', () => {
             fetch(`${API_URL}/employees`, {
                 headers: getAuthHeaders()
             })
             .then(res => res.json())
             .then(data => {
-                const tbody = document.getElementById('employeeTableBody');
-                tbody.innerHTML = '';
-                if(data.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No employees found</td></tr>';
-                    return;
-                }
-                data.forEach(emp => {
-                    const statusBadge = emp.isActive ? '<span class="badge active">Active</span>' : '<span class="badge inactive">Inactive</span>';
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${emp.employeeId || 'N/A'}</td>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <img src="https://ui-avatars.com/api/?name=${emp.firstName}+${emp.lastName}" style="width: 32px; border-radius: 50%;">
-                                    <div>
-                                        <div style="font-weight: 500;">${emp.firstName} ${emp.lastName}</div>
-                                        <div style="font-size: 12px; color: #64748b;">${emp.email}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>${emp.departmentName || 'N/A'}</td>
-                            <td>${emp.designation || 'N/A'}</td>
-                            <td>${statusBadge}</td>
-                            <td>
-                                <button style="background:none; border:none; color: #3b82f6; cursor: pointer; margin-right: 10px;"><i class="fas fa-edit"></i></button>
-                                <button style="background:none; border:none; color: #ef4444; cursor: pointer;"><i class="fas fa-trash"></i></button>
-                            </td>
-                        </tr>
-                    `;
-                });
+                allEmployees = data;
+                currentFilteredEmployees = data;
+                populateDepartmentFilter(data);
+                renderEmployees(data);
+                document.getElementById('empCountDisplay').innerText = `Showing ${data.length} employees`;
             })
             .catch(err => console.error('Error fetching employees:', err));
+
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('deptFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
         });
+
+        function populateDepartmentFilter(data) {
+            const deptFilter = document.getElementById('deptFilter');
+            const departments = new Set(data.map(emp => emp.departmentName).filter(Boolean));
+            deptFilter.innerHTML = '<option value="">All Departments</option>';
+            departments.forEach(dept => {
+                deptFilter.innerHTML += `<option value="${dept}">${dept}</option>`;
+            });
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const deptValue = document.getElementById('deptFilter').value;
+            const statusValue = document.getElementById('statusFilter').value;
+
+            currentFilteredEmployees = allEmployees.filter(emp => {
+                const fullName = `${emp.firstName} ${emp.lastName}`.toLowerCase();
+                const email = (emp.email || '').toLowerCase();
+                const empId = (emp.employeeId || '').toLowerCase();
+                
+                const matchesSearch = fullName.includes(searchTerm) || email.includes(searchTerm) || empId.includes(searchTerm);
+                
+                const matchesDept = deptValue === "" || emp.departmentName === deptValue;
+                
+                let matchesStatus = true;
+                if (statusValue === "Active") {
+                    matchesStatus = emp.isActive === true;
+                } else if (statusValue === "Inactive") {
+                    matchesStatus = emp.isActive === false || emp.isActive === null || emp.isActive === undefined;
+                }
+
+                return matchesSearch && matchesDept && matchesStatus;
+            });
+
+            renderEmployees(currentFilteredEmployees);
+            document.getElementById('empCountDisplay').innerText = `Showing ${currentFilteredEmployees.length} employees`;
+        }
+
+        function renderEmployees(data) {
+            const tbody = document.getElementById('employeeTableBody');
+            tbody.innerHTML = '';
+            if(data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No employees found</td></tr>';
+                return;
+            }
+            data.forEach(emp => {
+                const statusBadge = emp.isActive ? '<span class="status-pill status-active">Active</span>' : '<span class="status-pill status-leave">Inactive</span>';
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span style="font-weight: 500; color: var(--text-secondary);">#${emp.employeeId || 'N/A'}</span></td>
+                        <td>
+                            <div class="emp-name-cell">
+                                <img src="https://ui-avatars.com/api/?name=${emp.firstName}+${emp.lastName}&background=random&color=fff" class="avatar">
+                                <div>
+                                    <div style="font-weight: 500; font-size: 14px;">${emp.firstName} ${emp.lastName}</div>
+                                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">${emp.email}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <i class="fa-solid fa-briefcase" style="color: var(--text-secondary); font-size: 12px;"></i>
+                                ${emp.departmentName || 'N/A'}
+                            </div>
+                        </td>
+                        <td>${emp.designation || 'N/A'}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <button class="action-btn edit-btn"><i class="fas fa-edit"></i></button>
+                            <button class="action-btn delete-btn"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.text("Employee Directory", 14, 15);
+            
+            const tableData = currentFilteredEmployees.map(emp => [
+                emp.employeeId || 'N/A',
+                `${emp.firstName} ${emp.lastName}`,
+                emp.departmentName || 'N/A',
+                emp.designation || 'N/A',
+                emp.isActive ? 'Active' : 'Inactive'
+            ]);
+
+            doc.autoTable({
+                startY: 20,
+                head: [['Emp ID', 'Name', 'Department', 'Designation', 'Status']],
+                body: tableData,
+            });
+            
+            doc.save("employees.pdf");
+        }
     </script>
+<script src="js/theme.js"></script>
+
+<div class="modal-overlay" id="addEmpModal">
+    <div class="modal-content" style="max-width: 650px;">
+        <h2>Add New Employee</h2>
+        <form id="addEmpForm" onsubmit="submitEmpForm(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="form-group"><label>Employee ID *</label><input type="text" id="empIdInput" required placeholder="e.g., EMP001"></div>
+                <div class="form-group"><label>Department ID *</label><input type="number" id="empDeptId" required placeholder="e.g., 1"></div>
+                
+                <div class="form-group"><label>First Name *</label><input type="text" id="empFname" required></div>
+                <div class="form-group"><label>Last Name *</label><input type="text" id="empLname" required></div>
+                
+                <div class="form-group" style="grid-column: span 2;"><label>Email *</label><input type="email" id="empEmail" required></div>
+                
+                <div class="form-group"><label>Phone Number</label><input type="tel" id="empPhone" placeholder="Optional"></div>
+                <div class="form-group"><label>Date of Birth</label><input type="date" id="empDob"></div>
+                
+                <div class="form-group" style="grid-column: span 2;"><label>Address</label><input type="text" id="empAddress" placeholder="Optional"></div>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal('addEmpModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Employee</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function openEmpModal() { document.getElementById('addEmpModal').classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function submitEmpForm(e) {
+        e.preventDefault();
+        const data = {
+            employeeId: document.getElementById('empIdInput').value,
+            firstName: document.getElementById('empFname').value,
+            lastName: document.getElementById('empLname').value,
+            email: document.getElementById('empEmail').value,
+            department: { id: parseInt(document.getElementById('empDeptId').value) },
+            password: 'password123'
+        };
+
+        const phone = document.getElementById('empPhone').value;
+        const dob = document.getElementById('empDob').value;
+        const address = document.getElementById('empAddress').value;
+
+        if (phone) data.phoneNumber = phone;
+        if (dob) data.dateOfBirth = dob;
+        if (address) data.address = address;
+
+        fetch(API_URL + '/employees', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(data)
+        }).then(res => {
+            if(res.ok) { closeModal('addEmpModal'); location.reload(); }
+            else alert('Failed to add employee');
+        });
+    }
+</script>
+
 </body>
 </html>

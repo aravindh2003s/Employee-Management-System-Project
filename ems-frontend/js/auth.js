@@ -58,8 +58,19 @@ function logout() {
 
 function checkAuth() {
     const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user'));
+    
     if (!token && !window.location.pathname.endsWith('index.html')) {
         window.location.href = 'index.html';
+        return;
+    }
+    
+    if (user && user.role !== 'ROLE_ADMIN') {
+        const adminPages = ['admin-dashboard.html', 'employees.html', 'departments.html', 'attendance.html', 'leaves.html', 'payroll.html'];
+        const currentPage = window.location.pathname.split('/').pop();
+        if (adminPages.includes(currentPage)) {
+            window.location.href = 'employee-dashboard.html';
+        }
     }
 }
 

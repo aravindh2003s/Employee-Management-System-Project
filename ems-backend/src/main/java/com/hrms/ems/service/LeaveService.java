@@ -34,7 +34,7 @@ public class LeaveService {
         return leaveRequestRepository.save(leaveRequest);
     }
 
-    public LeaveRequest updateLeaveStatus(Long id, LeaveStatus status, String adminRemarks) {
+    public LeaveRequest updateLeaveStatus(@org.springframework.lang.NonNull Long id, LeaveStatus status, String adminRemarks) {
         LeaveRequest leave = leaveRequestRepository.findById(id).orElseThrow(() -> new RuntimeException("Leave not found"));
         leave.setStatus(status);
         leave.setAdminRemarks(adminRemarks);

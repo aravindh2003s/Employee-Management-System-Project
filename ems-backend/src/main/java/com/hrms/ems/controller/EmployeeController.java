@@ -2,11 +2,15 @@ package com.hrms.ems.controller;
 
 import com.hrms.ems.dto.EmployeeDTO;
 import com.hrms.ems.exception.ResourceNotFoundException;
+import com.hrms.ems.model.Role;
 import com.hrms.ems.model.User;
 import com.hrms.ems.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +23,9 @@ public class EmployeeController {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder encoder;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -27,21 +34,69 @@ public class EmployeeController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('EMPLOYEE')")
-    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable @org.springframework.lang.NonNull Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id :" + id));
         return ResponseEntity.ok(convertToDTO(user));
     }
+    
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('ADMIN')")
+    public ResponseEntity<EmployeeDTO> getCurrentEmployee() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with email: " + email));
+        return ResponseEntity.ok(convertToDTO(user));
+    }
+    
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody User employee) {
+        if (employee.getPassword() == null || employee.getPassword().isEmpty()) {
+            employee.setPassword("password123");
+        }
+        employee.setPassword(encoder.encode(employee.getPassword()));
+        
+        if (employee.getRole() == null) {
+            employee.setRole(Role.ROLE_EMPLOYEE);
+        }
+        
+        if (employee.getJoiningDate() == null) {
+            employee.setJoiningDate(java.time.LocalDate.now());
+        }
+        
+        User savedUser = userRepository.save(employee);
+        return ResponseEntity.ok(convertToDTO(savedUser));
+    }
+    
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable @org.springframework.lang.NonNull Long id, @RequestBody User employeeDetails) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id :" + id));
+        
+        user.setFirstName(employeeDetails.getFirstName());
+        user.setLastName(employeeDetails.getLastName());
+        user.setEmail(employeeDetails.getEmail());
+        
+        if (employeeDetails.getDepartment() != null) {
+            user.setDepartment(employeeDetails.getDepartment());
+        }
+        
+        User updatedUser = userRepository.save(user);
+        return ResponseEntity.ok(convertToDTO(updatedUser));
+    }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
+    public ResponseEntity<?> deleteEmployee(@PathVariable @org.springframework.lang.NonNull Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id :" + id));
         user.setIsActive(false);
         userRepository.save(user);
-        return ResponseEntity.ok("Employee marked as inactive successfully.");
+        return ResponseEntity.ok().build();
     }
 
     private EmployeeDTO convertToDTO(User user) {

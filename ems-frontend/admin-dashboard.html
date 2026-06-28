@@ -3,142 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR Nexus - Admin Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>HR Nexus - Dashboard</title>
+    <!-- Use Font Awesome for modern icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="app-container">
+
+    <!-- Floating App Wrapper -->
+    <div class="dashboard-wrapper">
+        
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-layer-group" style="color: var(--secondary-color); margin-right: 12px;"></i>
-                HR Nexus
+            <div class="brand-logo">
+                <div class="brand-icon"></div>
+                <span>HR Nexus</span>
             </div>
-            <ul class="sidebar-menu">
-                <li><a href="admin-dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-                <li><a href="employees.html"><i class="fas fa-users"></i> Employees</a></li>
-                <li><a href="departments.html"><i class="fas fa-building"></i> Departments</a></li>
-                <li><a href="attendance.html"><i class="fas fa-clock"></i> Attendance</a></li>
-                <li><a href="leaves.html"><i class="fas fa-calendar-alt"></i> Leave Management</a></li>
-                <li><a href="payroll.html"><i class="fas fa-money-check-alt"></i> Payroll</a></li>
-                <li><a href="#"><i class="fas fa-chart-bar"></i> Reports</a></li>
-                <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
-                <li><a href="#"><i class="fas fa-user-circle"></i> Profile</a></li>
-                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-                <li style="margin-top: 20px;"><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-item active"><i class="fa-solid fa-border-all"></i> Dashboard</a></li>
+                <li><a href="employees.html" class="nav-item"><i class="fa-solid fa-users"></i> Employees</a></li>
+                <li><a href="departments.html" class="nav-item"><i class="fa-solid fa-sitemap"></i> Departments</a></li>
+                <li><a href="attendance.html" class="nav-item"><i class="fa-regular fa-clock"></i> Attendance</a></li>
+                <li><a href="leaves.html" class="nav-item"><i class="fa-regular fa-calendar-check"></i> Leave</a></li>
+                <li><a href="payroll.html" class="nav-item"><i class="fa-solid fa-wallet"></i> Payroll</a></li>
+                <li><a href="#" class="nav-item"><i class="fa-solid fa-chart-line"></i> Reports</a></li>
+                <li><a href="#" class="nav-item"><i class="fa-regular fa-bell"></i> Notifications</a></li>
+                <li style="margin-top: auto;"><a href="#" class="nav-item"><i class="fa-solid fa-gear"></i> Settings</a></li>
             </ul>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
+            
             <!-- Top Header -->
             <header class="top-header">
-                <div class="search-bar" style="display: flex; align-items: center; background: #f1f5f9; padding: 8px 16px; border-radius: 20px; width: 300px;">
-                    <i class="fas fa-search" style="color: var(--text-secondary); margin-right: 10px;"></i>
-                    <input type="text" placeholder="Search employees, departments..." style="border: none; background: transparent; outline: none; width: 100%;">
+                <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" class="search-input" placeholder="Search...">
                 </div>
                 
-                <div class="user-profile" style="display: flex; align-items: center; gap: 20px;">
-                    <i class="fas fa-bell" style="font-size: 20px; color: var(--text-secondary); cursor: pointer;"></i>
-                    <div style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
-                        <div>
-                            <div style="font-size: 14px; font-weight: 600;" id="user-display-name">Admin User</div>
-                            <div style="font-size: 12px; color: var(--text-secondary);">HR Manager</div>
-                        </div>
+                <div class="header-actions">
+                    <div class="icon-btn"><i class="fa-regular fa-bell"></i></div>
+                    
+                    <div class="theme-toggle">
+                        <div class="theme-btn"><i class="fa-regular fa-sun"></i></div>
+                        <div class="theme-btn active"><i class="fa-regular fa-moon"></i></div>
+                    </div>
+                    
+                    <span class="date-display">Aug 26, 2023</span>
+                    
+                    <div class="user-profile">
+                        <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile">
                     </div>
                 </div>
             </header>
 
-            <!-- Page Content -->
-            <div class="content-area">
-                <div class="page-header">
-                    <h1 class="page-title">Dashboard Overview</h1>
+            <!-- Scrollable Dashboard Area -->
+            <div class="dashboard-scroll">
+                
+                <!-- Hero Section -->
+                <div class="hero-section">
                     <div>
-                        <button class="btn" style="width: auto; margin-left: 10px;"><i class="fas fa-user-plus"></i> Add Employee</button>
+                        <h1 class="hero-title">Good Morning, Aayush 👋</h1>
+                        <p class="hero-subtitle">Here's your company overview today.</p>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="openEmpModal()"><i class="fa-solid fa-plus"></i> Add Employee</button>
+                        <button class="btn btn-outline"><i class="fa-regular fa-file-lines"></i> Generate Report</button>
+                        <button class="btn btn-outline"><i class="fa-solid fa-arrow-up-from-bracket"></i> Export</button>
                     </div>
                 </div>
 
-                <!-- Stat Cards -->
-                <div class="dashboard-cards">
+                <!-- 4x2 Stats Grid -->
+                <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-                        <div class="stat-details">
-                            <h3>124</h3>
-                            <p>Total Employees</p>
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-purple"><i class="fa-solid fa-users"></i></div>
+                            Employees
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">360</div>
+                            <div class="trend down"><i class="fa-solid fa-arrow-trend-down"></i> Trend</div>
                         </div>
                     </div>
+
                     <div class="stat-card">
-                        <div class="stat-icon green"><i class="fas fa-building"></i></div>
-                        <div class="stat-details">
-                            <h3>8</h3>
-                            <p>Total Departments</p>
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-blue"><i class="fa-regular fa-clock"></i></div>
+                            Attendance
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">00.0%</div>
+                            <div class="trend up"><i class="fa-solid fa-arrow-trend-up"></i> Trend</div>
                         </div>
                     </div>
+
                     <div class="stat-card">
-                        <div class="stat-icon yellow"><i class="fas fa-calendar-check"></i></div>
-                        <div class="stat-details">
-                            <h3>115</h3>
-                            <p>Present Today</p>
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-blue"><i class="fa-solid fa-wallet"></i></div>
+                            Payroll
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">$12,30B</div>
+                            <div class="trend up"><i class="fa-solid fa-arrow-trend-up"></i> Trend</div>
                         </div>
                     </div>
+
                     <div class="stat-card">
-                        <div class="stat-icon red"><i class="fas fa-calendar-times"></i></div>
-                        <div class="stat-details">
-                            <h3>9</h3>
-                            <p>On Leave</p>
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-green"><i class="fa-solid fa-sitemap"></i></div>
+                            Departments
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">42</div>
+                            <div class="trend up"><i class="fa-solid fa-arrow-trend-up"></i> Trend</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-orange"><i class="fa-solid fa-leaf"></i></div>
+                            Open Leaves
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">16</div>
+                            <div class="trend up"><i class="fa-solid fa-arrow-trend-up"></i> Trend</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-green"><i class="fa-solid fa-user-plus"></i></div>
+                            New Hires
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">32</div>
+                            <div class="trend up"><i class="fa-solid fa-arrow-trend-up"></i> Trend</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-orange"><i class="fa-regular fa-clock"></i></div>
+                            Pending Requests
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">224</div>
+                            <div class="trend down"><i class="fa-solid fa-arrow-trend-down"></i> Trend</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div class="stat-icon-wrapper icon-pink"><i class="fa-solid fa-gift"></i></div>
+                            Birthdays
+                        </div>
+                        <div class="stat-value-row">
+                            <div class="stat-value">10</div>
+                            <div class="trend down"><i class="fa-solid fa-arrow-trend-down"></i> Trend</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts Section (Mock for UI) -->
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 30px;">
-                    <div class="table-card" style="padding: 24px;">
-                        <h3 style="margin-bottom: 20px;">Employee Growth</h3>
-                        <canvas id="growthChart" height="100"></canvas>
+                <!-- Lower Widgets Grid -->
+                <div class="widgets-grid">
+                    <!-- Area Chart -->
+                    <div class="widget-card">
+                        <div class="widget-title">Employee Growth</div>
+                        <div style="flex:1; position: relative;">
+                            <canvas id="growthChart"></canvas>
+                        </div>
                     </div>
-                    <div class="table-card" style="padding: 24px;">
-                        <h3 style="margin-bottom: 20px;">Department Distribution</h3>
-                        <canvas id="deptChart" height="200"></canvas>
+
+                    <!-- Donut Chart -->
+                    <div class="widget-card">
+                        <div class="widget-title">Department Distribution</div>
+                        <div style="flex:1; position: relative; display:flex; justify-content:center; align-items:center;">
+                            <div style="height: 120px; width: 120px;">
+                                <canvas id="deptChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Timeline -->
+                    <div class="widget-card">
+                        <div class="widget-title">Recent Activity</div>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-text">Recent activity</div>
+                                <div class="timeline-time">3 hours ago</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-text">Heart employment</div>
+                                <div class="timeline-time">1 month ago</div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-text">Pending mailing requests</div>
+                                <div class="timeline-time">1 month ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Assistant -->
+                    <div class="widget-card">
+                        <div class="widget-title" style="display:flex; justify-content:space-between;">
+                            AI HR Assistant
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 10px;">Suggested prompts to get suggested prompts.</div>
+                        <div class="ai-prompts">
+                            <div class="prompt-bubble">What's any employee name?</div>
+                            <div class="prompt-bubble">Customized employee resumes?</div>
+                        </div>
+                        <div class="ai-input-container">
+                            <input type="text" class="ai-input" placeholder="Suggested prompt...">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Bottom Table -->
+                <div class="table-card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Employee name</th>
+                                <th>Status</th>
+                                <th>Salary</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="emp-name-cell">
+                                        <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" class="avatar">
+                                        Aayush Aayush
+                                    </div>
+                                </td>
+                                <td><span class="status-pill status-leave">Employment Status</span></td>
+                                <td>$130,000</td>
+                                <td><div class="action-menu">Manage <i class="fa-solid fa-ellipsis"></i></div></td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="emp-name-cell">
+                                        <img src="https://i.pravatar.cc/150?u=a048581f4e29026701d" class="avatar">
+                                        Bhavik Bhavik
+                                    </div>
+                                </td>
+                                <td><span class="status-pill status-active">Active</span></td>
+                                <td>$120,000</td>
+                                <td><div class="action-menu">Manage <i class="fa-solid fa-ellipsis"></i></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </main>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/auth.js"></script>
+
+    <!-- Chart Setup Scripts -->
     <script>
-        // Init Charts
-        document.addEventListener('DOMContentLoaded', () => {
-            const ctx1 = document.getElementById('growthChart').getContext('2d');
-            new Chart(ctx1, {
+        // Setup simple mocked charts matching the image design
+        document.addEventListener("DOMContentLoaded", () => {
+            
+            // 1. Employee Growth (Area Chart with Gradient)
+            const ctxGrowth = document.getElementById('growthChart').getContext('2d');
+            
+            const gradient = ctxGrowth.createLinearGradient(0, 0, 0, 150);
+            gradient.addColorStop(0, 'rgba(139, 92, 246, 0.4)'); // Purple
+            gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');   // Cyan to transparent
+
+            new Chart(ctxGrowth, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    labels: ['2h', '4h', '6h', '12h', '10n'],
                     datasets: [{
-                        label: 'New Employees',
-                        data: [12, 19, 15, 25, 22, 30],
-                        borderColor: '#3b82f6',
-                        tension: 0.4
+                        data: [10, 25, 15, 45, 60],
+                        borderColor: '#06b6d4',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4, // smooth curves
+                        pointRadius: 0
                     }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: true, grid: {display: false}, border: {display: false}, ticks: {color: '#94a3b8', font:{size:10}} },
+                        y: { display: false, min: 0 }
+                    }
                 }
             });
 
-            const ctx2 = document.getElementById('deptChart').getContext('2d');
-            new Chart(ctx2, {
+            // 2. Department Distribution (Donut Chart)
+            const ctxDept = document.getElementById('deptChart').getContext('2d');
+            new Chart(ctxDept, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Engineering', 'Sales', 'HR', 'Marketing'],
+                    labels: ['Salary', 'Departms', 'Others'],
                     datasets: [{
-                        data: [45, 25, 10, 20],
-                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+                        data: [40, 35, 25],
+                        backgroundColor: [
+                            '#8b5cf6', // Purple
+                            '#06b6d4', // Cyan
+                            '#f472b6'  // Pink
+                        ],
+                        borderWidth: 0,
+                        cutout: '70%'
                     }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: {size: 9}, boxWidth: 8, padding: 5 }
+                        } 
+                    }
                 }
             });
         });
     </script>
+<script src="js/theme.js"></script>
+
+<div class="modal-overlay" id="addEmpModal">
+    <div class="modal-content">
+        <h2>Add New Employee</h2>
+        <form id="addEmpForm" onsubmit="submitEmpForm(event)">
+            <div class="form-group"><label>First Name</label><input type="text" id="empFname" required></div>
+            <div class="form-group"><label>Last Name</label><input type="text" id="empLname" required></div>
+            <div class="form-group"><label>Email</label><input type="email" id="empEmail" required></div>
+            <div class="form-group"><label>Department ID</label><input type="number" id="empDeptId" required></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-outline" onclick="closeModal('addEmpModal')">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save Employee</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function openEmpModal() { document.getElementById('addEmpModal').classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function submitEmpForm(e) {
+        e.preventDefault();
+        const data = {
+            firstName: document.getElementById('empFname').value,
+            lastName: document.getElementById('empLname').value,
+            email: document.getElementById('empEmail').value,
+            department: { id: parseInt(document.getElementById('empDeptId').value) },
+            password: 'password123',
+            employeeId: 'EMP' + Math.floor(Math.random() * 10000)
+        };
+        fetch(API_URL + '/employees', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
+            body: JSON.stringify(data)
+        }).then(res => {
+            if(res.ok) { closeModal('addEmpModal'); location.reload(); }
+            else alert('Failed to add employee');
+        });
+    }
+</script>
+
 </body>
 </html>

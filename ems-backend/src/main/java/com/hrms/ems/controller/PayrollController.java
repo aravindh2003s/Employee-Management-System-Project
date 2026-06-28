@@ -25,6 +25,7 @@ public class PayrollController {
 
     @PostMapping("/generate")
     @PreAuthorize("hasRole('ADMIN')")
+    @SuppressWarnings("null")
     public ResponseEntity<?> generatePayroll(@RequestBody Map<String, Object> request) {
         Long userId = Long.valueOf(request.get("userId").toString());
         int month = Integer.parseInt(request.get("month").toString());

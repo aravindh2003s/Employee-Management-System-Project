@@ -35,7 +35,7 @@ public class LeaveController {
 
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateLeaveStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    public ResponseEntity<?> updateLeaveStatus(@PathVariable @org.springframework.lang.NonNull Long id, @RequestBody Map<String, String> request) {
         LeaveStatus status = LeaveStatus.valueOf(request.get("status"));
         String remarks = request.get("adminRemarks");
         return ResponseEntity.ok(leaveService.updateLeaveStatus(id, status, remarks));
