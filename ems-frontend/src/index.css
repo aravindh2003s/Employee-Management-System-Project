@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 :root {
-    /* GlowTech Color Palette */
+    /* GrowTech Color Palette */
     --bg-dark: #192A47; /* Navy */
     --bg-light: #F4F7FE; /* Main body bg */
     
@@ -11,13 +11,13 @@
     --accent-orange: #F97316; /* Primary Accent */
     --accent-gradient: linear-gradient(135deg, var(--accent-orange), #FF8A00);
     
-    /* GlowTech Button Theme */
-    --glowtech-primary: #FCAA29;
-    --glowtech-primary-hover: #F28C18;
-    --glowtech-primary-glow: #FDBA4A;
-    --glowtech-secondary: #314D78;
-    --glowtech-secondary-hover: #3F6299;
-    --glowtech-text-light: #FFFFFF;
+    /* GrowTech Button Theme */
+    --GrowTech-primary: #FCAA29;
+    --GrowTech-primary-hover: #F28C18;
+    --GrowTech-primary-glow: #FDBA4A;
+    --GrowTech-secondary: #314D78;
+    --GrowTech-secondary-hover: #3F6299;
+    --GrowTech-text-light: #FFFFFF;
     
     /* Text */
     --text-primary: #111827;
@@ -295,12 +295,12 @@ h1, h2, h3, h4, h5, h6, .brand-logo {
 }
 
 .btn-primary {
-    background: var(--glowtech-primary);
-    color: var(--glowtech-text-light);
+    background: var(--GrowTech-primary);
+    color: var(--GrowTech-text-light);
     box-shadow: 0 8px 20px rgba(252,170,41,0.25);
 }
 .btn-primary:hover {
-    background: var(--glowtech-primary-hover);
+    background: var(--GrowTech-primary-hover);
     transform: translateY(-2px) scale(1.03);
     box-shadow: 0 12px 28px rgba(252,170,41,0.35);
 }
@@ -310,11 +310,11 @@ h1, h2, h3, h4, h5, h6, .brand-logo {
 }
 
 .btn-secondary {
-    background: var(--glowtech-secondary);
-    color: var(--glowtech-text-light);
+    background: var(--GrowTech-secondary);
+    color: var(--GrowTech-text-light);
 }
 .btn-secondary:hover {
-    background: var(--glowtech-secondary-hover);
+    background: var(--GrowTech-secondary-hover);
     transform: translateY(-2px) scale(1.03);
 }
 .btn-secondary:active {

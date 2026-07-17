@@ -41,7 +41,9 @@ const Login = () => {
         <div className="auth-page-wrapper">
             {/* Top Navigation Bar */}
             <div className="auth-top-nav">
-                <div className="auth-nav-logo">Logo</div>
+                <div className="auth-nav-logo">
+                    <img src="/logo.png" alt="GrowTech Logo" style={{ height: '40px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                </div>
                 <div className="auth-nav-links">
                     <a href="#">Home</a>
                     <a href="#">About</a>

@@ -13,6 +13,7 @@ const Signup = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -35,7 +36,9 @@ const Signup = () => {
         <div className="auth-page-wrapper">
             {/* Top Navigation Bar */}
             <div className="auth-top-nav">
-                <div className="auth-nav-logo">Logo</div>
+                <div className="auth-nav-logo">
+                    <img src="/logo.png" alt="GrowTech Logo" style={{ height: '40px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                </div>
                 <div className="auth-nav-links">
                     <a href="#">Home</a>
                     <a href="#">About</a>
@@ -59,7 +62,7 @@ const Signup = () => {
 
                 <h1 className="auth-title">Register</h1>
                 
-                <form onSubmit={handleSignup}>
+                <form onSubmit={handleSignup} autoComplete="off">
                     {error && <div className="auth-error">{error}</div>}
                     
                     <div style={{ display: 'flex', gap: '15px' }}>
@@ -71,6 +74,7 @@ const Signup = () => {
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
                                 required 
+                                autoComplete="off"
                             />
                             <i className="fa-solid fa-user auth-input-icon"></i>
                         </div>
@@ -82,6 +86,7 @@ const Signup = () => {
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
                                 required 
+                                autoComplete="off"
                             />
                             <i className="fa-solid fa-user auth-input-icon"></i>
                         </div>
@@ -95,6 +100,7 @@ const Signup = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required 
+                            autoComplete="off"
                         />
                         <i className="fa-solid fa-envelope auth-input-icon"></i>
                     </div>
@@ -102,13 +108,18 @@ const Signup = () => {
                     <div className="auth-input-group">
                         <label>Password</label>
                         <input 
-                            type="password" 
+                            type={showPassword ? 'text' : 'password'} 
                             className="auth-input" 
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required 
+                            autoComplete="new-password"
                         />
-                        <i className="fa-solid fa-lock auth-input-icon"></i>
+                        <i 
+                            className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} auth-input-icon`}
+                            style={{ cursor: 'pointer', zIndex: 10 }}
+                            onClick={() => setShowPassword(!showPassword)}
+                        ></i>
                     </div>
                     
                     <button type="submit" className="auth-submit-btn" disabled={loading} style={{ marginTop: '10px' }}>

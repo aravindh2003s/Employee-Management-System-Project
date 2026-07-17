@@ -11,8 +11,8 @@ const Settings = () => {
     // ADMIN SETTINGS STATES
     // ==========================================
     const [companyInfo, setCompanyInfo] = useState({
-        name: 'GlowTech EMS',
-        email: 'contact@glowtech.com',
+        name: 'GrowTech EMS',
+        email: 'contact@GrowTech.com',
         phone: '+1 (555) 123-4567',
         address: '123 Innovation Drive, Tech City, TC 90210'
     });
@@ -34,7 +34,7 @@ const Settings = () => {
     // ==========================================
     const [empProfile, setEmpProfile] = useState({
         fullName: `${user.firstName || 'Employee'} ${user.lastName || 'Name'}`,
-        email: user.email || 'employee@glowtech.com',
+        email: user.email || 'employee@GrowTech.com',
         phone: user.phoneNumber || '+1 555-0000',
         employeeId: user.employeeId || 'EMP-001',
         department: 'Engineering', // Would come from user info ideally
@@ -242,7 +242,7 @@ const Settings = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--surface-border)', paddingBottom: '10px' }}>
                             <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Application Name</span>
-                            <span style={{ fontWeight: '500', fontSize: '14px' }}>GlowTech EMS</span>
+                            <span style={{ fontWeight: '500', fontSize: '14px' }}>GrowTech EMS</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--surface-border)', paddingBottom: '10px' }}>
                             <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Version</span>
@@ -256,12 +256,12 @@ const Settings = () => {
                         ) : (
                             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--surface-border)', paddingBottom: '10px' }}>
                                 <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Contact HR</span>
-                                <span style={{ fontWeight: '500', fontSize: '14px' }}>hr@glowtech.com</span>
+                                <span style={{ fontWeight: '500', fontSize: '14px' }}>hr@GrowTech.com</span>
                             </div>
                         )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '5px' }}>
                             <span style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>Copyright</span>
-                            <span style={{ fontWeight: '500', fontSize: '14px' }}>&copy; 2026 GlowTech Inc.</span>
+                            <span style={{ fontWeight: '500', fontSize: '14px' }}>&copy; 2026 GrowTech Inc.</span>
                         </div>
                     </div>
                 </motion.div>

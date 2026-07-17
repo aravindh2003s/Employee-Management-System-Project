@@ -51,11 +51,8 @@ const Sidebar = () => {
 
     return (
         <aside className="sidebar">
-            <div className="brand-logo">
-                <div className="brand-icon">
-                    <i className="fa-solid fa-bolt"></i>
-                </div>
-                <span>GlowTech<br/><span style={{fontSize: '12px', fontWeight: '400'}}>EMS</span></span>
+            <div className="brand-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 0' }}>
+                <img src="/logo.png" alt="GrowTech Logo" style={{ maxWidth: '100%', maxHeight: '60px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
             </div>
             
             <ul className="nav-menu">
