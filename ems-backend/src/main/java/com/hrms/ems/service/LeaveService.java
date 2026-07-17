@@ -19,6 +19,9 @@ public class LeaveService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     public List<LeaveRequest> getAllLeaves() {
         return leaveRequestRepository.findAll();
     }
@@ -38,6 +41,15 @@ public class LeaveService {
         LeaveRequest leave = leaveRequestRepository.findById(id).orElseThrow(() -> new RuntimeException("Leave not found"));
         leave.setStatus(status);
         leave.setAdminRemarks(adminRemarks);
-        return leaveRequestRepository.save(leave);
+        LeaveRequest updatedLeave = leaveRequestRepository.save(leave);
+        
+        // Send notification to employee
+        String message = "Your leave request from " + leave.getStartDate() + " to " + leave.getEndDate() + " has been " + status + ".";
+        if (adminRemarks != null && !adminRemarks.isEmpty()) {
+            message += " Remarks: " + adminRemarks;
+        }
+        notificationService.createNotification(leave.getUser(), "Leave Request " + status, message);
+        
+        return updatedLeave;
     }
 }

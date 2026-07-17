@@ -70,7 +70,7 @@ public class AuthController {
         
         // Generate a random employee ID for now
         user.setEmployeeId("EMP-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase());
-        user.setRole(Role.ROLE_ADMIN); // First user can be admin, or we can pass it
+        user.setRole(Role.ROLE_EMPLOYEE); // Standard signups are Employees
         user.setJoiningDate(LocalDate.now());
 
         userRepository.save(user);

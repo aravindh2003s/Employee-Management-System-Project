@@ -33,6 +33,13 @@ public class LeaveController {
         return ResponseEntity.ok(leaveService.applyLeave(email, leaveRequest));
     }
 
+    @GetMapping("/my")
+    @PreAuthorize("hasRole('EMPLOYEE') or hasRole('ADMIN')")
+    public List<LeaveRequest> getMyLeaves(Authentication authentication) {
+        com.hrms.ems.security.UserDetailsImpl userDetails = (com.hrms.ems.security.UserDetailsImpl) authentication.getPrincipal();
+        return leaveService.getLeavesByUserId(userDetails.getId());
+    }
+
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateLeaveStatus(@PathVariable @org.springframework.lang.NonNull Long id, @RequestBody Map<String, String> request) {
