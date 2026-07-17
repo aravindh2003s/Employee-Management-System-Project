@@ -145,6 +145,68 @@ const EmployeeDashboard = () => {
                     </ul>
                 </div>
             </div>
+
+            <div className="table-card" style={{ padding: '40px', marginTop: '30px', lineHeight: '1.8' }}>
+                <h2 style={{ marginBottom: '30px', color: 'var(--text-primary)', borderBottom: '2px solid var(--accent-orange)', paddingBottom: '10px', display: 'inline-block' }}>About GlowTech</h2>
+                
+                <h3 style={{ marginTop: '10px', marginBottom: '15px', color: 'var(--glowtech-secondary)' }}>Welcome to GlowTech</h3>
+                <p style={{ marginBottom: '15px', color: 'var(--text-secondary)', fontSize: '15px' }}>At GlowTech, we are passionate about building innovative, reliable, and user-friendly software solutions that empower businesses to grow in the digital world. Our team specializes in developing modern web applications, mobile applications, and custom software tailored to meet real business needs.</p>
+                <p style={{ marginBottom: '30px', color: 'var(--text-secondary)', fontSize: '15px' }}>As part of our commitment to improving workplace productivity, we developed our own Employee Management System (EMS)—a centralized platform designed to simplify employee management and enhance organizational efficiency.</p>
+
+                <h3 style={{ marginTop: '20px', marginBottom: '15px', color: 'var(--glowtech-secondary)' }}>About the Employee Management System (EMS)</h3>
+                <p style={{ marginBottom: '30px', color: 'var(--text-secondary)', fontSize: '15px' }}>The Employee Management System is an all-in-one platform that helps organizations manage their workforce with ease. It enables employees and administrators to access essential information, streamline daily operations, and improve communication within the organization.</p>
+
+                <h3 style={{ marginTop: '20px', marginBottom: '15px', color: 'var(--glowtech-secondary)' }}>Key Features</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '15px', marginBottom: '40px' }}>
+                    {[
+                        'Secure employee login and role-based access',
+                        'Employee profile management',
+                        'Attendance and leave management',
+                        'Task and project tracking',
+                        'Document and information management',
+                        'Dashboard with real-time insights',
+                        'Responsive design for desktop and mobile devices'
+                    ].map((feature, index) => (
+                        <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                            <i className="fa-solid fa-circle-check" style={{ color: 'var(--accent-orange)' }}></i>
+                            <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>{feature}</span>
+                        </div>
+                    ))}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', marginBottom: '40px' }}>
+                    <div style={{ background: 'rgba(49, 77, 120, 0.05)', padding: '25px', borderRadius: '16px', border: '1px solid rgba(49, 77, 120, 0.1)' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--glowtech-secondary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '15px', fontSize: '18px' }}>
+                            <i className="fa-solid fa-rocket"></i>
+                        </div>
+                        <h3 style={{ marginBottom: '10px', color: 'var(--glowtech-secondary)' }}>Our Mission</h3>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>To deliver high-quality digital solutions that simplify business processes, improve productivity, and create lasting value for our clients and employees.</p>
+                    </div>
+                    <div style={{ background: 'rgba(252, 170, 41, 0.05)', padding: '25px', borderRadius: '16px', border: '1px solid rgba(252, 170, 41, 0.1)' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--accent-orange)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '15px', fontSize: '18px' }}>
+                            <i className="fa-solid fa-eye"></i>
+                        </div>
+                        <h3 style={{ marginBottom: '10px', color: 'var(--accent-orange)' }}>Our Vision</h3>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '14px', margin: 0 }}>To become a trusted technology partner by delivering innovative, scalable, and reliable software solutions that make a positive impact on businesses worldwide.</p>
+                    </div>
+                </div>
+
+                <h3 style={{ marginTop: '20px', marginBottom: '20px', color: 'var(--glowtech-secondary)' }}>Our Core Values</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '40px' }}>
+                    {['Innovation', 'Quality', 'Transparency', 'Collaboration', 'Continuous Learning', 'Customer Success'].map(value => (
+                        <span key={value} style={{ background: 'white', border: '1px solid var(--accent-orange)', color: 'var(--accent-orange)', padding: '8px 20px', borderRadius: '30px', fontSize: '14px', fontWeight: '600' }}>
+                            {value}
+                        </span>
+                    ))}
+                </div>
+
+                <div style={{ textAlign: 'center', padding: '40px 20px', background: 'linear-gradient(135deg, var(--glowtech-secondary) 0%, #1a2a40 100%)', color: 'white', borderRadius: '16px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
+                    <i className="fa-solid fa-quote-left" style={{ fontSize: '30px', color: 'var(--accent-orange)', marginBottom: '20px', opacity: '0.8' }}></i>
+                    <p style={{ fontSize: '18px', fontWeight: '500', margin: '0 auto', maxWidth: '800px', lineHeight: '1.6' }}>
+                        Thank you for being a part of GlowTech. Together, we are building technology that drives growth, efficiency, and innovation.
+                    </p>
+                </div>
+            </div>
         </>
     );
 };
