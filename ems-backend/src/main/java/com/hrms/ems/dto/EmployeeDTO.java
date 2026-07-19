@@ -19,6 +19,7 @@ public class EmployeeDTO {
     private EmploymentType employmentType;
     private Boolean isActive;
     private Role role;
+    private String profilePhotoUrl;
     
     // Getters and setters
     public Long getId() { return id; }
@@ -47,4 +48,6 @@ public class EmployeeDTO {
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    public String getProfilePhotoUrl() { return profilePhotoUrl; }
+    public void setProfilePhotoUrl(String profilePhotoUrl) { this.profilePhotoUrl = profilePhotoUrl; }
 }

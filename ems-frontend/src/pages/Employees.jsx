@@ -69,11 +69,15 @@ const Employees = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            const payload = { ...currentEmp };
+            if (payload.departmentId === '') {
+                payload.departmentId = null;
+            }
             if (isEditing) {
-                await employeeService.updateEmployee(currentEmp.id, currentEmp);
+                await employeeService.updateEmployee(currentEmp.id, payload);
                 toast.success('Employee updated successfully!');
             } else {
-                await employeeService.createEmployee(currentEmp);
+                await employeeService.createEmployee(payload);
                 toast.success('Employee created successfully!');
             }
             setShowModal(false);

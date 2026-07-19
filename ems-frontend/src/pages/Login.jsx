@@ -42,7 +42,7 @@ const Login = () => {
             {/* Top Navigation Bar */}
             <div className="auth-top-nav">
                 <div className="auth-nav-logo">
-                    <img src="/logo.png" alt="GrowTech Logo" style={{ height: '40px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                    <img src="/logo.png" alt="GrowTech Logo" style={{ height: '80px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
                 </div>
                 <div className="auth-nav-links">
                     <a href="#">Home</a>

@@ -244,3 +244,21 @@
     font-size: 13px;
     margin-bottom: 20px;
 }
+
+/* ==========================================================================
+   Responsive Media Queries for Auth
+   ========================================================================== */
+
+@media (max-width: 480px) {
+    .auth-glass-card {
+        width: 90%;
+        max-width: 400px;
+        padding: 20px;
+    }
+    .auth-top-nav {
+        padding: 10px 20px;
+    }
+    .auth-nav-links {
+        display: none; /* Hide nav links on mobile for cleaner auth flow */
+    }
+}

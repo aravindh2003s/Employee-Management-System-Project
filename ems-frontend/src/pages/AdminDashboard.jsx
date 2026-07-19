@@ -12,9 +12,8 @@ import {
   Legend,
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
+import dashboardService from '../services/dashboard.service';
 import employeeService from '../services/employee.service';
-import departmentService from '../services/department.service';
-import attendanceService from '../services/attendance.service';
 import { toast } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -33,26 +32,24 @@ ChartJS.register(
 const AdminDashboard = () => {
     const [showModal, setShowModal] = useState(false);
     const [employees, setEmployees] = useState([]);
-    const [departmentsCount, setDepartmentsCount] = useState(0);
-    const [attendanceCount, setAttendanceCount] = useState(0);
+    const [stats, setStats] = useState({
+        totalEmployees: 0,
+        totalDepartments: 0,
+        todayAttendancePercent: 0,
+        totalPayroll: 0,
+        departmentDistribution: {}
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const [emps, depts, atts] = await Promise.all([
-                    employeeService.getAllEmployees(),
-                    departmentService.getAllDepartments(),
-                    attendanceService.getAllAttendance()
+                const [adminStats, emps] = await Promise.all([
+                    dashboardService.getAdminStats(),
+                    employeeService.getAllEmployees() // Need this for the Recent Employees table
                 ]);
+                setStats(adminStats);
                 setEmployees(emps);
-                setDepartmentsCount(depts.length);
-                
-                // Calculate today's attendance percentage
-                const today = new Date().toISOString().split('T')[0];
-                const todaysAtt = atts.filter(a => a.date === today);
-                const attPercent = emps.length > 0 ? ((todaysAtt.length / emps.length) * 100).toFixed(1) : 0;
-                setAttendanceCount(attPercent);
             } catch (error) {
                 console.error("Error fetching dashboard data:", error);
                 toast.error("Failed to load dashboard data.");
@@ -87,11 +84,15 @@ const AdminDashboard = () => {
         }
     };
 
+    const deptLabels = Object.keys(stats.departmentDistribution || {});
+    const deptValues = Object.values(stats.departmentDistribution || {});
+    const colors = ['#8b5cf6', '#06b6d4', '#f472b6', '#F97316', '#3b82f6', '#10b981'];
+
     const deptData = {
-        labels: ['Salary', 'Departms', 'Others'],
+        labels: deptLabels.length > 0 ? deptLabels : ['No Data'],
         datasets: [{
-            data: [40, 35, 25],
-            backgroundColor: ['#8b5cf6', '#06b6d4', '#f472b6'],
+            data: deptValues.length > 0 ? deptValues : [1],
+            backgroundColor: colors,
             borderWidth: 0,
             cutout: '70%'
         }]
@@ -136,7 +137,7 @@ const AdminDashboard = () => {
                         Employees
                     </div>
                     <div className="stat-value-row">
-                        <div className={`stat-value ${loading ? 'skeleton skeleton-text' : ''}`}>{loading ? '' : employees.length}</div>
+                        <div className={`stat-value ${loading ? 'skeleton skeleton-text' : ''}`}>{loading ? '' : stats.totalEmployees}</div>
                         <div className="trend up"><i className="fa-solid fa-arrow-trend-up"></i> Active</div>
                     </div>
                 </motion.div>
@@ -146,7 +147,7 @@ const AdminDashboard = () => {
                         Attendance (Today)
                     </div>
                     <div className="stat-value-row">
-                        <div className={`stat-value ${loading ? 'skeleton skeleton-text' : ''}`}>{loading ? '' : `${attendanceCount}%`}</div>
+                        <div className={`stat-value ${loading ? 'skeleton skeleton-text' : ''}`}>{loading ? '' : `${stats.todayAttendancePercent}%`}</div>
                         <div className="trend up"><i className="fa-solid fa-arrow-trend-up"></i> Live</div>
                     </div>
                 </motion.div>
@@ -156,7 +157,7 @@ const AdminDashboard = () => {
                         Departments
                     </div>
                     <div className="stat-value-row">
-                        <div className={`stat-value ${loading ? 'skeleton skeleton-text' : ''}`}>{loading ? '' : departmentsCount}</div>
+                        <div className={`stat-value ${loading ? 'skeleton skeleton-text' : ''}`}>{loading ? '' : stats.totalDepartments}</div>
                         <div className="trend up"><i className="fa-solid fa-arrow-trend-up"></i> Divisions</div>
                     </div>
                 </motion.div>
@@ -166,8 +167,8 @@ const AdminDashboard = () => {
                         Payroll
                     </div>
                     <div className="stat-value-row">
-                        <div className="stat-value">$--</div>
-                        <div className="trend up"><i className="fa-solid fa-arrow-trend-up"></i> Coming Soon</div>
+                        <div className={`stat-value ${loading ? 'skeleton skeleton-text' : ''}`}>{loading ? '' : `$${stats.totalPayroll.toLocaleString()}`}</div>
+                        <div className="trend up"><i className="fa-solid fa-arrow-trend-up"></i> Disbursed</div>
                     </div>
                 </motion.div>
             </motion.div>

@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import authService from '../services/auth.service';
+import profileService from '../services/profile.service';
 import { toast } from 'react-hot-toast';
 
 const Settings = () => {
     const user = authService.getCurrentUser() || {};
     const isAdmin = user.role === 'ROLE_ADMIN';
+    const fileInputRef = useRef(null);
 
     // ==========================================
     // ADMIN SETTINGS STATES
@@ -18,9 +20,10 @@ const Settings = () => {
     });
 
     const [adminProfile, setAdminProfile] = useState({
-        fullName: `${user.firstName || 'Aravindhan'} ${user.lastName || 'S'}`,
-        email: user.email || 'aravindh2003s@gmail.com',
-        phone: user.phoneNumber || '+91 9876543210'
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phoneNumber || ''
     });
 
     const [adminNotifications, setAdminNotifications] = useState({
@@ -33,12 +36,13 @@ const Settings = () => {
     // EMPLOYEE SETTINGS STATES
     // ==========================================
     const [empProfile, setEmpProfile] = useState({
-        fullName: `${user.firstName || 'Employee'} ${user.lastName || 'Name'}`,
-        email: user.email || 'employee@GrowTech.com',
-        phone: user.phoneNumber || '+1 555-0000',
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phoneNumber || '',
         employeeId: user.employeeId || 'EMP-001',
-        department: 'Engineering', // Would come from user info ideally
-        position: 'Software Engineer' // Would come from user info ideally
+        department: user.departmentName || 'Not Assigned',
+        position: user.designation || 'Not Assigned'
     });
 
     const [empNotifications, setEmpNotifications] = useState({
@@ -47,16 +51,90 @@ const Settings = () => {
     });
 
     // ==========================================
-    // SHARED / HANDLERS
+    // PASSWORD MODAL STATE
     // ==========================================
-    const handleSave = (e, message) => {
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: ''
+    });
+
+    // ==========================================
+    // HANDLERS
+    // ==========================================
+    const handleSaveCompanyInfo = (e) => {
         e.preventDefault();
-        toast.success(message);
+        toast.success('Company Information saved successfully!');
     };
 
-    const handleChangePassword = (e) => {
+    const handleSaveNotifications = (e) => {
         e.preventDefault();
-        toast.success('Password changed successfully!');
+        toast.success('Notification preferences saved!');
+    };
+
+    const handleProfileUpdate = async (e, isAd) => {
+        e.preventDefault();
+        const profileData = isAd ? adminProfile : empProfile;
+        try {
+            const res = await profileService.updateProfileInfo({
+                firstName: profileData.firstName,
+                lastName: profileData.lastName,
+                email: profileData.email,
+                phoneNumber: profileData.phone
+            });
+            authService.updateCurrentUser(res.data);
+            toast.success('Profile updated successfully!');
+            // If email changed, we might want to tell them to re-login, but let's keep it simple
+            if (profileData.email !== user.email) {
+                toast.error('Email changed! Please log in again.');
+                authService.logout();
+                window.location.href = '/login';
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Error updating profile');
+        }
+    };
+
+    const handlePasswordChange = async (e) => {
+        e.preventDefault();
+        try {
+            await profileService.changePassword(passwordData);
+            toast.success('Password changed successfully!');
+            setShowPasswordModal(false);
+            setPasswordData({ currentPassword: '', newPassword: '' });
+        } catch (error) {
+            toast.error(error.response?.data || 'Error changing password');
+        }
+    };
+
+    const handlePictureUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const res = await profileService.uploadProfilePicture(file);
+            authService.updateCurrentUser(res.data);
+            toast.success('Profile picture updated!');
+            // Force a re-render or reload to show the image if needed, but since we use authService.getCurrentUser() 
+            // inside components, it might need a page reload to reflect globally if context isn't used.
+            window.location.reload(); 
+        } catch (error) {
+            toast.error('Error uploading picture');
+        }
+    };
+
+    // Helper to get image URL or initial
+    const renderAvatar = () => {
+        if (user.profilePhotoUrl) {
+            return (
+                <img 
+                    src={`http://localhost:8080${user.profilePhotoUrl}`} 
+                    alt="Profile" 
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                />
+            );
+        }
+        return (user.firstName ? user.firstName.charAt(0) : 'U');
     };
 
     return (
@@ -67,14 +145,23 @@ const Settings = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', paddingBottom: '30px' }}>
+            <div className="settings-grid">
                 
+                {/* Hidden File Input */}
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    style={{ display: 'none' }} 
+                    accept="image/*" 
+                    onChange={handlePictureUpload} 
+                />
+
                 {isAdmin ? (
                     <>
                         {/* 1. Company Information */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="table-card" style={{ padding: '24px' }}>
                             <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>1. Company Information</h3>
-                            <form onSubmit={(e) => handleSave(e, 'Company Information saved successfully!')} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <form onSubmit={handleSaveCompanyInfo} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
                                     <div style={{ width: '60px', height: '60px', background: 'rgba(249, 115, 22, 0.1)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-orange)', fontSize: '24px' }}>
                                         <i className="fa-solid fa-bolt"></i>
@@ -107,23 +194,29 @@ const Settings = () => {
                         {/* 2. Admin Profile */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="table-card" style={{ padding: '24px' }}>
                             <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>2. Admin Profile</h3>
-                            <form onSubmit={(e) => handleSave(e, 'Admin Profile updated successfully!')} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <form onSubmit={(e) => handleProfileUpdate(e, true)} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
                                     <div style={{ width: '60px', height: '60px', background: 'var(--accent-orange)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
-                                        {adminProfile.fullName.charAt(0)}
+                                        {renderAvatar()}
                                     </div>
                                     <div>
-                                        <button type="button" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12px' }}>Change Picture</button>
+                                        <button type="button" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => fileInputRef.current.click()}>Change Picture</button>
                                     </div>
                                 </div>
 
-                                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                    <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Full Name</label>
-                                    <input type="text" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={adminProfile.fullName} onChange={(e) => setAdminProfile({...adminProfile, fullName: e.target.value})} />
+                                <div className="form-row">
+                                    <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                        <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>First Name</label>
+                                        <input type="text" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={adminProfile.firstName} onChange={(e) => setAdminProfile({...adminProfile, firstName: e.target.value})} required />
+                                    </div>
+                                    <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                        <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Last Name</label>
+                                        <input type="text" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={adminProfile.lastName} onChange={(e) => setAdminProfile({...adminProfile, lastName: e.target.value})} required />
+                                    </div>
                                 </div>
                                 <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                     <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Email</label>
-                                    <input type="email" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={adminProfile.email} onChange={(e) => setAdminProfile({...adminProfile, email: e.target.value})} />
+                                    <input type="email" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={adminProfile.email} onChange={(e) => setAdminProfile({...adminProfile, email: e.target.value})} required />
                                 </div>
                                 <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                     <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Phone Number</label>
@@ -132,7 +225,7 @@ const Settings = () => {
                                 
                                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
                                     <button type="submit" className="btn btn-primary">Update Profile</button>
-                                    <button type="button" className="btn btn-secondary" onClick={handleChangePassword}>Change Password</button>
+                                    <button type="button" className="btn btn-secondary" onClick={() => setShowPasswordModal(true)}>Change Password</button>
                                 </div>
                             </form>
                         </motion.div>
@@ -142,7 +235,7 @@ const Settings = () => {
                             <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>3. Notifications</h3>
                             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>Choose which notifications you would like to receive via email.</p>
                             
-                            <form onSubmit={(e) => handleSave(e, 'Notification preferences saved!')} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <form onSubmit={handleSaveNotifications} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '14px' }}>
                                     <input type="checkbox" style={{ width: '16px', height: '16px', accentColor: 'var(--accent-orange)' }} checked={adminNotifications.employeeAdded} onChange={(e) => setAdminNotifications({...adminNotifications, employeeAdded: e.target.checked})} />
                                     Employee Added
@@ -167,22 +260,28 @@ const Settings = () => {
                         {/* 1. My Profile */}
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="table-card" style={{ padding: '24px' }}>
                             <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>1. My Profile</h3>
-                            <form onSubmit={(e) => handleSave(e, 'Profile updated successfully!')} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <form onSubmit={(e) => handleProfileUpdate(e, false)} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
                                     <div style={{ width: '60px', height: '60px', background: 'var(--accent-cyan)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px', fontWeight: 'bold' }}>
-                                        {empProfile.fullName.charAt(0)}
+                                        {renderAvatar()}
                                     </div>
                                     <div>
-                                        <button type="button" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12px' }}>Change Picture</button>
+                                        <button type="button" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={() => fileInputRef.current.click()}>Change Picture</button>
                                     </div>
                                 </div>
 
-                                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                                    <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Full Name</label>
-                                    <input type="text" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={empProfile.fullName} onChange={(e) => setEmpProfile({...empProfile, fullName: e.target.value})} />
+                                <div className="form-row">
+                                    <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                        <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>First Name</label>
+                                        <input type="text" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={empProfile.firstName} onChange={(e) => setEmpProfile({...empProfile, firstName: e.target.value})} required />
+                                    </div>
+                                    <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                        <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Last Name</label>
+                                        <input type="text" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={empProfile.lastName} onChange={(e) => setEmpProfile({...empProfile, lastName: e.target.value})} required />
+                                    </div>
                                 </div>
 
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                                <div className="form-row">
                                     <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                         <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Employee ID</label>
                                         <input type="text" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box', backgroundColor: 'var(--surface-bg)', color: 'var(--text-secondary)' }} value={empProfile.employeeId} readOnly />
@@ -199,7 +298,7 @@ const Settings = () => {
 
                                 <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                     <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Email</label>
-                                    <input type="email" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={empProfile.email} onChange={(e) => setEmpProfile({...empProfile, email: e.target.value})} />
+                                    <input type="email" className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={empProfile.email} onChange={(e) => setEmpProfile({...empProfile, email: e.target.value})} required />
                                 </div>
                                 <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                     <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Phone Number</label>
@@ -214,13 +313,13 @@ const Settings = () => {
                             {/* 2. Security */}
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="table-card" style={{ padding: '24px' }}>
                                 <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>2. Security</h3>
-                                <button type="button" className="btn btn-secondary" onClick={handleChangePassword}>Change Password</button>
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowPasswordModal(true)}>Change Password</button>
                             </motion.div>
 
                             {/* 3. Notifications */}
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="table-card" style={{ padding: '24px' }}>
                                 <h3 style={{ marginBottom: '20px', fontSize: '18px' }}>3. Notifications</h3>
-                                <form onSubmit={(e) => handleSave(e, 'Notification preferences saved!')} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                <form onSubmit={handleSaveNotifications} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                                     <label style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '14px' }}>
                                         <input type="checkbox" style={{ width: '16px', height: '16px', accentColor: 'var(--accent-orange)' }} checked={empNotifications.emailNotifications} onChange={(e) => setEmpNotifications({...empNotifications, emailNotifications: e.target.checked})} />
                                         Email Notifications
@@ -267,6 +366,34 @@ const Settings = () => {
                 </motion.div>
 
             </div>
+
+            {/* Change Password Modal */}
+            {showPasswordModal && (
+                <div className="modal-overlay">
+                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="modal-content">
+                        <div className="modal-header">
+                            <h3>Change Password</h3>
+                            <button className="close-btn" onClick={() => setShowPasswordModal(false)}><i className="fa-solid fa-times"></i></button>
+                        </div>
+                        <form onSubmit={handlePasswordChange}>
+                            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                    <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Current Password</label>
+                                    <input type="password" required className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={passwordData.currentPassword} onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})} />
+                                </div>
+                                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                                    <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>New Password</label>
+                                    <input type="password" required className="form-control" style={{ padding: '10px', borderRadius: '8px', border: '1px solid var(--surface-border)', width: '100%', boxSizing: 'border-box' }} value={passwordData.newPassword} onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})} />
+                                </div>
+                            </div>
+                            <div className="modal-footer" style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowPasswordModal(false)}>Cancel</button>
+                                <button type="submit" className="btn btn-primary">Change Password</button>
+                            </div>
+                        </form>
+                    </motion.div>
+                </div>
+            )}
         </div>
     );
 };

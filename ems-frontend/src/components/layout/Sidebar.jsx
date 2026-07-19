@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import authService from '../../services/auth.service';
 import notificationService from '../../services/notification.service';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
     const user = authService.getCurrentUser();
     const isAdmin = user && user.role === 'ROLE_ADMIN';
     const navigate = useNavigate();
@@ -22,13 +22,13 @@ const Sidebar = () => {
     };
 
     useEffect(() => {
-        if (user) {
+        if (user && user.id) {
             fetchNotifications();
             // Polling every 30 seconds for new notifications
             const interval = setInterval(fetchNotifications, 30000);
             return () => clearInterval(interval);
         }
-    }, [user]);
+    }, [user?.id]);
 
     const handleLogout = (e) => {
         e.preventDefault();
@@ -50,9 +50,11 @@ const Sidebar = () => {
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     return (
-        <aside className="sidebar">
+        <>
+            <div className={`sidebar-overlay ${isOpen ? 'active' : ''}`} onClick={onClose}></div>
+            <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
             <div className="brand-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px 0' }}>
-                <img src="/logo.png" alt="GrowTech Logo" style={{ maxWidth: '100%', maxHeight: '60px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                <img src="/logo.png" alt="GrowTech Logo" style={{ maxWidth: '100%', maxHeight: '100px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
             </div>
             
             <ul className="nav-menu">
@@ -185,6 +187,7 @@ const Sidebar = () => {
             )}
             </AnimatePresence>
         </aside>
+        </>
     );
 };
 

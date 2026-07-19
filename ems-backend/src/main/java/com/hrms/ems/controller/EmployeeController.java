@@ -1,9 +1,12 @@
 package com.hrms.ems.controller;
 
 import com.hrms.ems.dto.EmployeeDTO;
+import com.hrms.ems.dto.EmployeeRequestDTO;
 import com.hrms.ems.exception.ResourceNotFoundException;
+import com.hrms.ems.model.Department;
 import com.hrms.ems.model.Role;
 import com.hrms.ems.model.User;
+import com.hrms.ems.repository.DepartmentRepository;
 import com.hrms.ems.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,9 @@ public class EmployeeController {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private DepartmentRepository departmentRepository;
     
     @Autowired
     private PasswordEncoder encoder;
@@ -53,36 +59,81 @@ public class EmployeeController {
     
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody User employee) {
-        if (employee.getPassword() == null || employee.getPassword().isEmpty()) {
-            employee.setPassword("password123");
-        }
-        employee.setPassword(encoder.encode(employee.getPassword()));
+    public ResponseEntity<EmployeeDTO> createEmployee(@RequestBody EmployeeRequestDTO request) {
+        User employee = new User();
+        employee.setFirstName(request.getFirstName());
+        employee.setLastName(request.getLastName());
+        employee.setEmail(request.getEmail());
+        employee.setPhoneNumber(request.getPhoneNumber());
+        employee.setDesignation(request.getDesignation());
+        employee.setSalary(request.getSalary());
+        employee.setGender(request.getGender());
+        employee.setEmploymentType(request.getEmploymentType());
         
-        if (employee.getRole() == null) {
+        // Auto-generate employeeId
+        long count = userRepository.count();
+        employee.setEmployeeId("EMP-" + String.format("%04d", count + 100));
+
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            employee.setPassword(encoder.encode("password123"));
+        } else {
+            employee.setPassword(encoder.encode(request.getPassword()));
+        }
+        
+        if (request.getRole() == null) {
             employee.setRole(Role.ROLE_EMPLOYEE);
+        } else {
+            employee.setRole(request.getRole());
         }
         
-        if (employee.getJoiningDate() == null) {
+        if (request.getJoiningDate() == null) {
             employee.setJoiningDate(java.time.LocalDate.now());
+        } else {
+            employee.setJoiningDate(request.getJoiningDate());
         }
         
+        if (request.getDepartmentId() != null && !String.valueOf(request.getDepartmentId()).isEmpty()) {
+            long deptId = request.getDepartmentId();
+            Department dept = departmentRepository.findById(deptId).orElse(null);
+            employee.setDepartment(dept);
+        }
+        
+        employee.setIsActive(true);
         User savedUser = userRepository.save(employee);
         return ResponseEntity.ok(convertToDTO(savedUser));
     }
     
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable @org.springframework.lang.NonNull Long id, @RequestBody User employeeDetails) {
+    public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable @org.springframework.lang.NonNull Long id, @RequestBody EmployeeRequestDTO request) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Employee not found with id :" + id));
         
-        user.setFirstName(employeeDetails.getFirstName());
-        user.setLastName(employeeDetails.getLastName());
-        user.setEmail(employeeDetails.getEmail());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setDesignation(request.getDesignation());
         
-        if (employeeDetails.getDepartment() != null) {
-            user.setDepartment(employeeDetails.getDepartment());
+        if (request.getSalary() != null) {
+            user.setSalary(request.getSalary());
+        }
+        if (request.getGender() != null) {
+            user.setGender(request.getGender());
+        }
+        if (request.getEmploymentType() != null) {
+            user.setEmploymentType(request.getEmploymentType());
+        }
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
+        }
+        
+        if (request.getDepartmentId() != null) {
+            long deptId = request.getDepartmentId();
+            Department dept = departmentRepository.findById(deptId).orElse(null);
+            user.setDepartment(dept);
+        } else {
+            user.setDepartment(null);
         }
         
         User updatedUser = userRepository.save(user);
@@ -116,6 +167,7 @@ public class EmployeeController {
         dto.setEmploymentType(user.getEmploymentType());
         dto.setIsActive(user.getIsActive());
         dto.setRole(user.getRole());
+        dto.setProfilePhotoUrl(user.getProfilePhotoUrl());
         return dto;
     }
 }

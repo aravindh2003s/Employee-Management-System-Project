@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -6,12 +6,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const DashboardLayout = () => {
     const location = useLocation();
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <div className="dashboard-wrapper">
-            <Sidebar />
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
             <main className="main-content">
-                <Header />
+                <Header onMenuToggle={() => setIsSidebarOpen(prev => !prev)} />
                 <div className="dashboard-scroll">
                     <AnimatePresence mode="wait">
                         <motion.div

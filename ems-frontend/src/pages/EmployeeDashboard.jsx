@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import authService from '../services/auth.service';
 import attendanceService from '../services/attendance.service';
+import dashboardService from '../services/dashboard.service';
 
 const EmployeeDashboard = () => {
     const user = authService.getCurrentUser();
     const navigate = useNavigate();
 
     const [isCheckedIn, setIsCheckedIn] = useState(false);
+    const [stats, setStats] = useState({ leaveBalance: 0, hoursThisWeek: 0 });
+    const [loadingStats, setLoadingStats] = useState(true);
 
     const fetchAttendance = async () => {
         try {
@@ -21,8 +24,20 @@ const EmployeeDashboard = () => {
         }
     };
 
+    const fetchStats = async () => {
+        try {
+            const data = await dashboardService.getEmployeeStats();
+            setStats(data);
+        } catch (error) {
+            console.error("Error fetching employee stats:", error);
+        } finally {
+            setLoadingStats(false);
+        }
+    };
+
     useEffect(() => {
         fetchAttendance();
+        fetchStats();
     }, []);
 
     const handleCheckIn = async () => {
@@ -96,7 +111,7 @@ const EmployeeDashboard = () => {
                         Leave Balance
                     </div>
                     <div className="stat-value-row">
-                        <div className="stat-value">12 Days</div>
+                        <div className={`stat-value ${loadingStats ? 'skeleton skeleton-text' : ''}`}>{loadingStats ? '' : `${stats.leaveBalance} Days`}</div>
                         <div className="trend up"><i className="fa-solid fa-arrow-trend-up"></i> Available</div>
                     </div>
                 </div>
@@ -107,7 +122,7 @@ const EmployeeDashboard = () => {
                         Hours This Week
                     </div>
                     <div className="stat-value-row">
-                        <div className="stat-value">32.5h</div>
+                        <div className={`stat-value ${loadingStats ? 'skeleton skeleton-text' : ''}`}>{loadingStats ? '' : `${stats.hoursThisWeek}h`}</div>
                     </div>
                 </div>
             </div>

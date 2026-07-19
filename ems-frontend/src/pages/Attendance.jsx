@@ -78,6 +78,19 @@ const Attendance = () => {
                     <h1 className="hero-title">{isAdmin ? 'Company Attendance' : 'My Attendance'}</h1>
                     <p className="hero-subtitle">{isAdmin ? 'Monitor employee check-ins and check-outs across the organization.' : 'Manage your daily check-ins and view your attendance history.'}</p>
                 </div>
+                {!isAdmin && (
+                    <div className="hero-actions">
+                        {!isCheckedIn ? (
+                            <button className="btn btn-primary" onClick={handleClockIn}>
+                                <i className="fa-solid fa-right-to-bracket"></i> Clock In
+                            </button>
+                        ) : (
+                            <button className="btn btn-secondary" onClick={handleClockOut} style={{ background: 'var(--accent-orange)', color: 'white', borderColor: 'var(--accent-orange)' }}>
+                                <i className="fa-solid fa-right-from-bracket"></i> Clock Out
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
 

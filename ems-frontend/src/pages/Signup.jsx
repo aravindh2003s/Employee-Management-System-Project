@@ -37,7 +37,7 @@ const Signup = () => {
             {/* Top Navigation Bar */}
             <div className="auth-top-nav">
                 <div className="auth-nav-logo">
-                    <img src="/logo.png" alt="GrowTech Logo" style={{ height: '40px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                    <img src="/logo.png" alt="GrowTech Logo" style={{ height: '80px', objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
                 </div>
                 <div className="auth-nav-links">
                     <a href="#">Home</a>
@@ -65,7 +65,7 @@ const Signup = () => {
                 <form onSubmit={handleSignup} autoComplete="off">
                     {error && <div className="auth-error">{error}</div>}
                     
-                    <div style={{ display: 'flex', gap: '15px' }}>
+                    <div className="form-row">
                         <div className="auth-input-group" style={{ flex: 1 }}>
                             <label>First Name</label>
                             <input 

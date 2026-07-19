@@ -27,7 +27,8 @@ public class NotificationController {
     @PreAuthorize("hasRole('EMPLOYEE') or hasRole('ADMIN')")
     public ResponseEntity<List<Notification>> getMyNotifications(Authentication authentication) {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        User user = userRepository.findById(userDetails.getId()).orElse(null);
+        long userId = userDetails.getId();
+        User user = userRepository.findById(userId).orElse(null);
         return ResponseEntity.ok(notificationService.getMyNotifications(user));
     }
 
